@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Word Detection App</title>
+    </head>
+    <body>
+        <img id="wordGif" src="no_word.jpg" style="display: block;" />
+        
+        <script>
+            var recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+
+            // Ensure continuous listening
+            recognition.continuous = true;
+
+            recognition.onresult = function(event) {
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        if (event.results[i][0].transcript.toLowerCase().trim() == 'howdy') {
+                            switchGif('clint.gif');
+                            setTimeout(function() { switchGif('no_word.jpg') }, 5000);
+                        }
+                    }
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.log('Error occurred in recognition: ' + event.error);
+            }
+
+            function switchGif(gifName) {
+                document.getElementById('wordGif').src = gifName;
+            }
+
+            function startRecognition() {
+                recognition.start();
+            }
+
+            function getPermissions() {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(function(stream) {
+                        startRecognition();
+                    })
+                    .catch(function(err) {
+                        console.log('Error occurred while getting permissions: ' + err);
+                    });
+            }
+
+            window.onload = function() {
+                getPermissions();
+            }
+        </script>
+    </body>
+</html>
